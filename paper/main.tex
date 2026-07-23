@@ -14,8 +14,6 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{float}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage{cite}
 \usepackage{xcolor}
@@ -349,19 +347,18 @@ stage logits.
 The absence of per-bone stage labels in RSNA is addressed via a
 probabilistic assignment strategy:
 
-\begin{algorithm}[H]
-\caption{TW2 Pseudo-label Generation}
-\label{alg:pseudolabel}
-\begin{algorithmic}[1]
-\Require Age $t$ (months), sex $s$, bone $b$
-\Require Gaussian params $\{\mu_{b,s,k}, \sigma_{b,s,k}\}$ per stage $k$
-\For{each stage $k \in \mathcal{S}_b$}
-  \State $d_k \leftarrow \mathcal{N}(t \mid \mu_{b,s,k}, \sigma_{b,s,k})$
-\EndFor
-\State $p_k \leftarrow d_k / \sum_{k'} d_{k'}$
-\State \Return $\arg\max_k p_k$
-\end{algorithmic}
-\end{algorithm}
+\begin{center}
+\fbox{\begin{minipage}{0.92\columnwidth}
+\textbf{Algorithm 1:} TW2 Pseudo-label Generation\\[2pt]
+\textbf{Input:} age $t$ (months), sex $s$, bone $b$,
+  Gaussian params $\{\mu_{b,s,k}, \sigma_{b,s,k}\}$\\[2pt]
+\textbf{for} each stage $k \in \mathcal{S}_b$ \textbf{do}\\
+\quad $d_k \leftarrow \mathcal{N}(t \mid \mu_{b,s,k}, \sigma_{b,s,k})$\\
+\textbf{end for}\\
+$p_k \leftarrow d_k / \sum_{k'} d_{k'}$\\
+\textbf{return} $\hat{k} = \arg\max_k\; p_k$
+\end{minipage}}
+\end{center}
 
 The Gaussian parameters encode the mean age and SD at which 50\% of
 children of sex $s$ reach stage $k$ for bone $b$, derived from published
