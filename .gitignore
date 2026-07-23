@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.env
+
+# Model weights (too large for git)
+backend/ml/weights/*.pt
+backend/ml/weights/*.pth
+
+# Data
+data/rsna/
+data/annotations/*.csv
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

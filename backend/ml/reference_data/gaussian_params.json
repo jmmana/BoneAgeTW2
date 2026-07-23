@@ -1,0 +1,50 @@
+{
+  "_source": "Derived from TW2/TW3 stage progression data (Tanner & Whitehouse 1983, Tanner et al 2001). Mean age (months) and SD at which each stage appears for each bone, by sex.",
+  "_note": "For each bone and stage, 'mean' is the expected age in months at which 50% of children reach that stage, 'sd' is the standard deviation. Used to render Gaussian distribution curves.",
+
+  "male": {
+    "radius":    {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":66,"sd":8},"F":{"mean":102,"sd":9},"G":{"mean":138,"sd":8},"H":{"mean":162,"sd":7},"I":{"mean":192,"sd":6}},
+    "ulna":      {"A":{"mean":0,"sd":3},"B":{"mean":18,"sd":5},"C":{"mean":30,"sd":6},"D":{"mean":48,"sd":7},"E":{"mean":72,"sd":8},"F":{"mean":108,"sd":9},"G":{"mean":144,"sd":8},"H":{"mean":168,"sd":7},"I":{"mean":198,"sd":6}},
+    "mc1":       {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":4},"C":{"mean":18,"sd":5},"D":{"mean":30,"sd":6},"E":{"mean":48,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":120,"sd":9},"H":{"mean":156,"sd":7},"I":{"mean":180,"sd":6}},
+    "mc3":       {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":66,"sd":8},"F":{"mean":96,"sd":9},"G":{"mean":132,"sd":8},"H":{"mean":162,"sd":7},"I":{"mean":186,"sd":6}},
+    "mc5":       {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":66,"sd":8},"F":{"mean":96,"sd":9},"G":{"mean":132,"sd":8},"H":{"mean":162,"sd":7},"I":{"mean":186,"sd":6}},
+    "pp1":       {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":4},"C":{"mean":18,"sd":5},"D":{"mean":30,"sd":6},"E":{"mean":54,"sd":7},"F":{"mean":84,"sd":8},"G":{"mean":126,"sd":9},"H":{"mean":162,"sd":7},"I":{"mean":186,"sd":6}},
+    "pp3":       {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":66,"sd":8},"F":{"mean":96,"sd":9},"G":{"mean":132,"sd":8},"H":{"mean":162,"sd":7},"I":{"mean":186,"sd":6}},
+    "pp5":       {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":66,"sd":8},"F":{"mean":96,"sd":9},"G":{"mean":132,"sd":8},"H":{"mean":162,"sd":7},"I":{"mean":186,"sd":6}},
+    "mp3":       {"A":{"mean":0,"sd":3},"B":{"mean":18,"sd":5},"C":{"mean":30,"sd":6},"D":{"mean":54,"sd":7},"E":{"mean":78,"sd":8},"F":{"mean":108,"sd":9},"G":{"mean":144,"sd":8},"H":{"mean":168,"sd":7},"I":{"mean":192,"sd":6}},
+    "mp5":       {"A":{"mean":0,"sd":3},"B":{"mean":18,"sd":5},"C":{"mean":30,"sd":6},"D":{"mean":54,"sd":7},"E":{"mean":78,"sd":8},"F":{"mean":108,"sd":9},"G":{"mean":144,"sd":8},"H":{"mean":168,"sd":7},"I":{"mean":192,"sd":6}},
+    "dp1":       {"A":{"mean":0,"sd":3},"B":{"mean":6,"sd":3},"C":{"mean":15,"sd":4},"D":{"mean":27,"sd":5},"E":{"mean":48,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":120,"sd":8},"H":{"mean":156,"sd":7},"I":{"mean":180,"sd":6}},
+    "dp3":       {"A":{"mean":0,"sd":3},"B":{"mean":6,"sd":3},"C":{"mean":15,"sd":4},"D":{"mean":27,"sd":5},"E":{"mean":48,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":120,"sd":8},"H":{"mean":156,"sd":7},"I":{"mean":180,"sd":6}},
+    "dp5":       {"A":{"mean":0,"sd":3},"B":{"mean":6,"sd":3},"C":{"mean":15,"sd":4},"D":{"mean":27,"sd":5},"E":{"mean":48,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":120,"sd":8},"H":{"mean":156,"sd":7},"I":{"mean":180,"sd":6}},
+    "capitate":  {"A":{"mean":0,"sd":3},"B":{"mean":3,"sd":2},"C":{"mean":9,"sd":3},"D":{"mean":18,"sd":4},"E":{"mean":36,"sd":6},"F":{"mean":60,"sd":8},"G":{"mean":96,"sd":9},"H":{"mean":144,"sd":8}},
+    "hamate":    {"A":{"mean":0,"sd":3},"B":{"mean":3,"sd":2},"C":{"mean":9,"sd":3},"D":{"mean":18,"sd":4},"E":{"mean":36,"sd":6},"F":{"mean":60,"sd":8},"G":{"mean":96,"sd":9},"H":{"mean":144,"sd":8}},
+    "triquetral":{"A":{"mean":0,"sd":3},"B":{"mean":6,"sd":3},"C":{"mean":15,"sd":4},"D":{"mean":27,"sd":5},"E":{"mean":48,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":114,"sd":9},"H":{"mean":156,"sd":8}},
+    "lunate":    {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":66,"sd":8},"F":{"mean":96,"sd":9},"G":{"mean":132,"sd":8},"H":{"mean":168,"sd":7}},
+    "scaphoid":  {"A":{"mean":0,"sd":3},"B":{"mean":18,"sd":5},"C":{"mean":30,"sd":6},"D":{"mean":48,"sd":7},"E":{"mean":72,"sd":8},"F":{"mean":102,"sd":9},"G":{"mean":138,"sd":8},"H":{"mean":174,"sd":7}},
+    "trapezoid": {"A":{"mean":0,"sd":3},"B":{"mean":24,"sd":5},"C":{"mean":36,"sd":6},"D":{"mean":54,"sd":7},"E":{"mean":78,"sd":8},"F":{"mean":108,"sd":9},"G":{"mean":144,"sd":8},"H":{"mean":180,"sd":7}},
+    "trapezium": {"A":{"mean":0,"sd":3},"B":{"mean":24,"sd":5},"C":{"mean":36,"sd":6},"D":{"mean":54,"sd":7},"E":{"mean":78,"sd":8},"F":{"mean":108,"sd":9},"G":{"mean":144,"sd":8},"H":{"mean":180,"sd":7}}
+  },
+
+  "female": {
+    "radius":    {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":3},"C":{"mean":18,"sd":4},"D":{"mean":33,"sd":5},"E":{"mean":54,"sd":7},"F":{"mean":84,"sd":8},"G":{"mean":120,"sd":8},"H":{"mean":144,"sd":7},"I":{"mean":168,"sd":6}},
+    "ulna":      {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":39,"sd":6},"E":{"mean":60,"sd":7},"F":{"mean":90,"sd":8},"G":{"mean":126,"sd":8},"H":{"mean":150,"sd":7},"I":{"mean":174,"sd":6}},
+    "mc1":       {"A":{"mean":0,"sd":3},"B":{"mean":6,"sd":3},"C":{"mean":15,"sd":4},"D":{"mean":24,"sd":5},"E":{"mean":39,"sd":6},"F":{"mean":63,"sd":7},"G":{"mean":102,"sd":8},"H":{"mean":138,"sd":7},"I":{"mean":162,"sd":6}},
+    "mc3":       {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":3},"C":{"mean":18,"sd":4},"D":{"mean":33,"sd":5},"E":{"mean":54,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":114,"sd":8},"H":{"mean":144,"sd":7},"I":{"mean":168,"sd":6}},
+    "mc5":       {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":3},"C":{"mean":18,"sd":4},"D":{"mean":33,"sd":5},"E":{"mean":54,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":114,"sd":8},"H":{"mean":144,"sd":7},"I":{"mean":168,"sd":6}},
+    "pp1":       {"A":{"mean":0,"sd":3},"B":{"mean":6,"sd":3},"C":{"mean":15,"sd":4},"D":{"mean":24,"sd":5},"E":{"mean":42,"sd":6},"F":{"mean":66,"sd":8},"G":{"mean":108,"sd":8},"H":{"mean":144,"sd":7},"I":{"mean":168,"sd":6}},
+    "pp3":       {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":3},"C":{"mean":18,"sd":4},"D":{"mean":33,"sd":5},"E":{"mean":54,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":114,"sd":8},"H":{"mean":144,"sd":7},"I":{"mean":168,"sd":6}},
+    "pp5":       {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":3},"C":{"mean":18,"sd":4},"D":{"mean":33,"sd":5},"E":{"mean":54,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":114,"sd":8},"H":{"mean":144,"sd":7},"I":{"mean":168,"sd":6}},
+    "mp3":       {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":63,"sd":7},"F":{"mean":90,"sd":8},"G":{"mean":126,"sd":8},"H":{"mean":150,"sd":7},"I":{"mean":174,"sd":6}},
+    "mp5":       {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":42,"sd":6},"E":{"mean":63,"sd":7},"F":{"mean":90,"sd":8},"G":{"mean":126,"sd":8},"H":{"mean":150,"sd":7},"I":{"mean":174,"sd":6}},
+    "dp1":       {"A":{"mean":0,"sd":3},"B":{"mean":3,"sd":2},"C":{"mean":12,"sd":3},"D":{"mean":21,"sd":4},"E":{"mean":39,"sd":6},"F":{"mean":63,"sd":7},"G":{"mean":102,"sd":8},"H":{"mean":138,"sd":7},"I":{"mean":162,"sd":6}},
+    "dp3":       {"A":{"mean":0,"sd":3},"B":{"mean":3,"sd":2},"C":{"mean":12,"sd":3},"D":{"mean":21,"sd":4},"E":{"mean":39,"sd":6},"F":{"mean":63,"sd":7},"G":{"mean":102,"sd":8},"H":{"mean":138,"sd":7},"I":{"mean":162,"sd":6}},
+    "dp5":       {"A":{"mean":0,"sd":3},"B":{"mean":3,"sd":2},"C":{"mean":12,"sd":3},"D":{"mean":21,"sd":4},"E":{"mean":39,"sd":6},"F":{"mean":63,"sd":7},"G":{"mean":102,"sd":8},"H":{"mean":138,"sd":7},"I":{"mean":162,"sd":6}},
+    "capitate":  {"A":{"mean":0,"sd":3},"B":{"mean":2,"sd":2},"C":{"mean":6,"sd":3},"D":{"mean":15,"sd":4},"E":{"mean":30,"sd":5},"F":{"mean":51,"sd":7},"G":{"mean":84,"sd":8},"H":{"mean":126,"sd":8}},
+    "hamate":    {"A":{"mean":0,"sd":3},"B":{"mean":2,"sd":2},"C":{"mean":6,"sd":3},"D":{"mean":15,"sd":4},"E":{"mean":30,"sd":5},"F":{"mean":51,"sd":7},"G":{"mean":84,"sd":8},"H":{"mean":126,"sd":8}},
+    "triquetral":{"A":{"mean":0,"sd":3},"B":{"mean":3,"sd":2},"C":{"mean":12,"sd":3},"D":{"mean":21,"sd":4},"E":{"mean":39,"sd":6},"F":{"mean":63,"sd":7},"G":{"mean":99,"sd":8},"H":{"mean":138,"sd":8}},
+    "lunate":    {"A":{"mean":0,"sd":3},"B":{"mean":9,"sd":3},"C":{"mean":18,"sd":4},"D":{"mean":33,"sd":5},"E":{"mean":54,"sd":7},"F":{"mean":78,"sd":8},"G":{"mean":114,"sd":8},"H":{"mean":150,"sd":7}},
+    "scaphoid":  {"A":{"mean":0,"sd":3},"B":{"mean":12,"sd":4},"C":{"mean":24,"sd":5},"D":{"mean":39,"sd":6},"E":{"mean":60,"sd":7},"F":{"mean":84,"sd":8},"G":{"mean":120,"sd":8},"H":{"mean":156,"sd":7}},
+    "trapezoid": {"A":{"mean":0,"sd":3},"B":{"mean":18,"sd":5},"C":{"mean":30,"sd":6},"D":{"mean":45,"sd":7},"E":{"mean":66,"sd":8},"F":{"mean":90,"sd":9},"G":{"mean":126,"sd":8},"H":{"mean":162,"sd":7}},
+    "trapezium": {"A":{"mean":0,"sd":3},"B":{"mean":18,"sd":5},"C":{"mean":30,"sd":6},"D":{"mean":45,"sd":7},"E":{"mean":66,"sd":8},"F":{"mean":90,"sd":9},"G":{"mean":126,"sd":8},"H":{"mean":162,"sd":7}}
+  }
+}

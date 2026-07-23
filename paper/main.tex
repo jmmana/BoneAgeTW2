@@ -1,0 +1,696 @@
+%% ============================================================
+%%  BoneAgeTW2 -- Paper academico completo
+%%  Maestria en Inteligencia Artificial - Universidad de La Salle
+%%  Autor: Juan Manuel Castillo Pinto - jmmana@gmail.com
+%%  Julio 2026
+%% ============================================================
+\documentclass[12pt,a4paper,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,english]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\newcommand{\doi}[1]{\href{https://doi.org/#1}{\texttt{doi:#1}}}
+
+\geometry{
+  a4paper,
+  top=2.5cm, bottom=2.5cm,
+  left=1.8cm, right=1.8cm,
+  columnsep=0.8cm
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{BoneAgeTW2: Automated Skeletal Maturation with TW2 and Deep Learning}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!10},
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!60!black},
+}
+
+%% ============================================================
+\title{%
+  \textbf{BoneAgeTW2: Sistema Automatizado de Estimacion de Maduracion Osea
+  mediante el Metodo Tanner-Whitehouse 2 y Aprendizaje Profundo}\\[0.4em]
+  {\large BoneAgeTW2: Automated Skeletal Maturation Assessment Using
+  the Tanner-Whitehouse 2 Method and Deep Learning}
+}
+
+\author{%
+  Juan Manuel Castillo Pinto\\
+  \small Maestria en Inteligencia Artificial\\
+  \small Universidad de La Salle, Bogota, Colombia\\
+  \small \href{mailto:jmmana@gmail.com}{jmmana@gmail.com}
+}
+
+\date{Julio 2026}
+
+%% ============================================================
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+%% Abstract (English) ----------------------------------------
+\begin{abstract}
+\textbf{Background.}
+Skeletal maturity assessment is a cornerstone of pediatric endocrinology,
+auxology, and forensic medicine. The Tanner-Whitehouse 2 (TW2) method scores
+20 individual hand bones across maturation stages A through I and is the
+gold standard in Latin America and Europe. Its manual execution is
+time-consuming, highly operator-dependent, and no open-source software
+currently replicates the complete TW2 pipeline with individual bone-level
+interpretation.
+\textbf{Objective.}
+We present \textbf{BoneAgeTW2}, an end-to-end deep-learning system that
+(1) automatically segments and identifies the 20 TW2 bones from a hand
+radiograph, (2) classifies each bone into its maturation stage using an
+EfficientNet-B3 classifier with 20 specialized heads, (3) computes TW2
+RUS and Carpal scores, (4) estimates bone age with 90\% confidence
+intervals, and (5) renders interactive Gaussian distribution curves.
+\textbf{Dataset.}
+We use the RSNA Pediatric Bone Age Challenge dataset \cite{rsna2017},
+comprising 12,611 hand radiographs with bone age labels.
+\textbf{Code:}
+\url{https://github.com/jmmana/BoneAgeTW2}
+\end{abstract}
+
+%% Resumen (Espanol) -----------------------------------------
+\bigskip
+\noindent\rule{\columnwidth}{0.4pt}
+\smallskip
+\noindent\textbf{Resumen.}
+La evaluacion de la maduracion esqueletica es fundamental en endocrinologia
+pediatrica, auxologia y medicina forense. El metodo Tanner-Whitehouse 2 (TW2)
+puntua 20 huesos individuales de la mano en estadios A a I y es el estandar
+de referencia en Latinoamerica y Europa. Presentamos \textbf{BoneAgeTW2},
+un sistema de aprendizaje profundo de extremo a extremo que segmenta
+automaticamente los 20 huesos TW2, clasifica cada uno en su estadio de
+maduracion, calcula los scores RUS y Carpal, estima la edad osea con
+intervalos de confianza del 90\%, y renderiza curvas de distribucion
+gaussiana interactivas. Usamos el dataset RSNA Pediatric Bone Age Challenge
+(12,611 radiografias). Codigo: \url{https://github.com/jmmana/BoneAgeTW2}.
+
+\smallskip
+\noindent\textbf{Keywords:} bone age assessment, skeletal maturity,
+Tanner-Whitehouse, deep learning, EfficientNet, YOLOv8, pseudo-labeling,
+RSNA, pediatric radiology, explainable AI.
+\noindent\rule{\columnwidth}{0.4pt}
+\bigskip
+
+%% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+Bone age (skeletal age) is the biological age of the skeleton determined
+from the degree of ossification of the hand and wrist bones in a standard
+anteroposterior radiograph. Clinicians use it to diagnose growth disorders,
+evaluate the effects of hormone therapy, estimate chronological age in
+forensic contexts, and guide orthodontic and orthopedic
+planning~\cite{grote2012}.
+
+\subsection{Clinical Significance}
+
+In Latin America and Spain, the Tanner-Whitehouse 2 (TW2) method is the
+dominant standard for bone age assessment~\cite{tannerTW2}. Its defining
+advantage over the atlas-based Greulich-Pyle (GP) method~\cite{gp1959} is
+individual bone interpretation: each of 20 specific bones is assigned a
+maturation stage (A--I), scored numerically, and summed into a composite
+RUS (radius-ulna-short bones) or Carpal score that maps to bone age via
+sex-specific reference curves.
+
+\subsection{Problem Statement}
+
+Despite the clinical value of TW2, its adoption is limited by three
+practical barriers:
+\begin{enumerate}[noitemsep]
+  \item \textbf{Operator expertise}: Correctly staging 20 bones requires
+    years of training; inter-rater variability can exceed $\pm 12$
+    months~\cite{grote2012}.
+  \item \textbf{Time cost}: Manual TW2 assessment takes 10--20 minutes
+    per case.
+  \item \textbf{Software gap}: Commercial solutions
+    (BoneXpert~\cite{bonexpert}) are proprietary black boxes; open-source
+    solutions (Deeplasia~\cite{deeplasia}) predict age end-to-end without
+    individual bone staging.
+\end{enumerate}
+
+\subsection{Contribution}
+
+BoneAgeTW2 bridges this gap by providing:
+\begin{itemize}[noitemsep]
+  \item The first open-source implementation of the complete TW2 method
+    with AI-assisted bone-level staging.
+  \item A pseudo-labeling strategy that extracts per-bone stage labels from
+    globally-labeled bone age datasets.
+  \item An interactive web application with Gaussian distribution curves
+    reproducing the original TW2 graphical output.
+  \item A fully documented REST API suitable for integration into hospital
+    PACS systems.
+\end{itemize}
+
+%% ============================================================
+\section{Background and Related Work}
+\label{sec:background}
+
+\subsection{Bone Age Assessment Methods}
+
+\paragraph{Greulich-Pyle (GP).}
+Compares the hand radiograph against an atlas of reference
+images~\cite{gp1959}. Fast but subjective; validated primarily in
+North American White populations.
+
+\paragraph{Tanner-Whitehouse (TW1/TW2/TW3).}
+A scoring system where each of $N$ bones is assigned a maturation stage
+with a numeric score~\cite{tannerTW2,tw32001}. TW2 uses 20 bones; TW3
+refines the reference curves using more recent European data. The
+\emph{RUS} subscore (13 bones) is the primary predictor; the
+\emph{Carpal} subscore (7 bones) provides complementary information.
+
+\paragraph{Fels method.}
+Probabilistic approach based on 98 measurements and observations of hand
+bones~\cite{fels1988}. High precision but rarely used outside the USA.
+
+\subsection{Deep Learning for Bone Age Assessment}
+
+The RSNA 2017 Pediatric Bone Age Challenge~\cite{rsna2017} catalyzed a wave
+of deep learning work. Winning solutions achieved MAE $\approx 4.3$--6
+months using CNNs trained end-to-end. Subsequently:
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Deeplasia}~\cite{deeplasia}: EfficientNet-based open-source
+    model robust to skeletal dysplasias.
+  \item \textbf{Rassmann et al.}~\cite{rassmann2023}: End-to-end deep
+    learning; MAE $\approx 5.8$ months.
+  \item \textbf{BoneXpert}~\cite{bonexpert}: Commercial CE-marked software
+    using Active Shape Models.
+  \item \textbf{CarpIAn}~\cite{carpian}: Argentinian hospital AI; no
+    open-source release.
+\end{itemize}
+
+\subsection{Gap Analysis}
+
+\begin{table}[H]
+\centering
+\caption{Comparison of existing bone age systems.}
+\label{tab:gap}
+\scriptsize
+\begin{tabularx}{\columnwidth}{@{}lXXX@{}}
+\toprule
+System & Open & TW2 & Per-bone \\
+\midrule
+Deeplasia      & \checkmark & $\times$ & $\times$ \\
+BoneXpert      & $\times$   & \checkmark & partial  \\
+GP atlas       & N/A        & $\times$ & $\times$ \\
+\textbf{Ours}  & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%% ============================================================
+\section{Dataset}
+\label{sec:dataset}
+
+\subsection{RSNA Pediatric Bone Age Challenge Dataset}
+
+We use the publicly available RSNA 2017 dataset~\cite{rsna2017}, obtained
+from:
+\begin{center}
+\small\url{https://www.kaggle.com/datasets/kmader/rsna-bone-age}
+\end{center}
+
+\begin{table}[H]
+\centering
+\caption{RSNA dataset statistics.}
+\label{tab:dataset}
+\scriptsize
+\begin{tabularx}{\columnwidth}{@{}lXXX@{}}
+\toprule
+Split & Total & Male & Female \\
+\midrule
+Train      & 12,611 & 6,833 & 5,778 \\
+Validation & 1,425  & --    & --    \\
+Test       & 200    & --    & --    \\
+\midrule
+\textbf{Total} & \textbf{14,236} & & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Age distribution.}
+Bone ages range from 1 to 228 months (0--19 years), with a roughly
+uniform distribution, enabling coverage of all TW2 maturation stages.
+Each image is a left-hand anteroposterior radiograph; right-hand images
+are horizontally flipped during preprocessing.
+
+\paragraph{Image characteristics.}
+Images were acquired across multiple clinical sites, resulting in
+variability in exposure, contrast, resolution, and patient positioning.
+This heterogeneity serves as implicit data augmentation for model
+robustness.
+
+\subsection{Limitations of the Dataset for TW2}
+
+The RSNA dataset provides \emph{global} bone age labels (in months) but
+no \emph{per-bone stage} annotations. This is the fundamental challenge:
+the dataset contains the ground truth for the \emph{output} of TW2
+(bone age) but not for the \emph{intermediate representation} (individual
+bone stages). Our pseudo-labeling strategy addresses this limitation.
+
+%% ============================================================
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Stage 1: Image Preprocessing}
+\label{sec:preproc}
+
+All radiographs undergo the following pipeline:
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{Format loading}: DICOM files read with \texttt{pydicom};
+    PNG/JPEG with OpenCV. MONOCHROME1 photometric interpretation is
+    inverted so bones appear bright on dark background.
+  \item \textbf{Pixel spacing extraction}: DICOM
+    \texttt{PixelSpacing} metadata yields the true mm-per-pixel scale
+    factor (\emph{digital escalimetry}). For non-DICOM inputs, users
+    specify the scale factor manually; a default of 0.143 mm/px is
+    assumed.
+  \item \textbf{Hand orientation}: A brightness-mass heuristic detects
+    whether the thumb is on the left or right, flipping right-hand images
+    to a standardized left-hand orientation.
+  \item \textbf{Contrast enhancement}: CLAHE (clip limit 2.0, tile
+    size $8{\times}8$) improves bone margin visibility.
+  \item \textbf{Resize and normalize}: Images resized to
+    $512{\times}512$ pixels, normalized to $[0, 1]$.
+\end{enumerate}
+
+\subsection{Stage 2: Bone Region Detection}
+\label{sec:detection}
+
+We employ YOLOv8-small~\cite{yolov8} fine-tuned to detect 20 bounding
+box regions corresponding to the TW2 bone set.
+
+\paragraph{TW2 bone set.}
+The 20 TW2 bones comprise two groups:
+\begin{itemize}[noitemsep]
+  \item \textbf{RUS (13 bones)}: radius, ulna; metacarpals I, III, V;
+    proximal phalanges I, III, V; middle phalanges III, V; distal
+    phalanges I, III, V.
+  \item \textbf{Carpal (7 bones)}: capitate, hamate, triquetral, lunate,
+    scaphoid, trapezoid, trapezium.
+\end{itemize}
+
+\paragraph{Anatomical priors.}
+The 20 TW2 bones occupy known relative positions within the hand. We
+encode these as normalized bounding box priors
+$(c_x, c_y, w, h) \in [0,1]^4$. These serve as: (a) initial anchor
+positions for YOLO fine-tuning, and (b) a robust fallback detection
+mechanism when model weights are unavailable.
+
+\subsection{Stage 3: Maturation Stage Classification}
+\label{sec:classifier}
+
+\subsubsection{Architecture}
+
+We employ an EfficientNet-B3~\cite{efficientnet} backbone pretrained on
+ImageNet, followed by 20 independent classification heads. Each head:
+\begin{equation}
+  f_b(\mathbf{x}) = W_b \, \text{ReLU}(\text{Drop}_{0.3}(W_1 \phi(\mathbf{x})))
+\end{equation}
+where $\phi(\cdot)$ is the backbone feature extractor,
+$W_1 \in \mathbb{R}^{d \times 256}$ is a shared projection, and
+$W_b \in \mathbb{R}^{256 \times K_b}$ projects to $K_b \in \{8, 9\}$
+stage logits.
+
+\subsubsection{Pseudo-label Generation}
+
+The absence of per-bone stage labels in RSNA is addressed via a
+probabilistic assignment strategy:
+
+\begin{algorithm}[H]
+\caption{TW2 Pseudo-label Generation}
+\label{alg:pseudolabel}
+\begin{algorithmic}[1]
+\Require Age $t$ (months), sex $s$, bone $b$
+\Require Gaussian params $\{\mu_{b,s,k}, \sigma_{b,s,k}\}$ per stage $k$
+\For{each stage $k \in \mathcal{S}_b$}
+  \State $d_k \leftarrow \mathcal{N}(t \mid \mu_{b,s,k}, \sigma_{b,s,k})$
+\EndFor
+\State $p_k \leftarrow d_k / \sum_{k'} d_{k'}$
+\State \Return $\arg\max_k p_k$
+\end{algorithmic}
+\end{algorithm}
+
+The Gaussian parameters encode the mean age and SD at which 50\% of
+children of sex $s$ reach stage $k$ for bone $b$, derived from published
+TW2/TW3 reference data~\cite{tannerTW2,tw32001}.
+
+\subsubsection{Training Details}
+
+\begin{table}[H]
+\centering
+\caption{Training hyperparameters.}
+\label{tab:hyperparams}
+\scriptsize
+\begin{tabularx}{\columnwidth}{@{}lX@{}}
+\toprule
+Hyperparameter & Value \\
+\midrule
+Optimizer     & AdamW ($\lambda{=}10^{-4}$) \\
+LR            & $10^{-4}$ \\
+Scheduler     & Cosine annealing ($T_{\max}{=}20$) \\
+Batch size    & 32 \\
+Epochs        & 20 \\
+Loss          & Cross-entropy + label smoothing $\epsilon{=}0.1$ \\
+Input res.    & $96{\times}96$ per-bone ROI \\
+Backbone      & EfficientNet-B3, ImageNet pretrained \\
+Split         & 90\%/10\% stratified by age decile \\
+Augmentation  & HFlip, Rotation(10\textdegree), ColorJitter \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Stage 4: TW2 Scoring}
+\label{sec:scoring}
+
+Given the predicted stage vector $\{k_b\}_{b=1}^{20}$:
+\begin{align}
+  S_{\text{RUS}} &= \sum_{b \in \mathcal{B}_\text{RUS}} w_{b,k_b}
+  \label{eq:rus}\\
+  S_{\text{Carpal}} &= \sum_{b \in \mathcal{B}_\text{Carpal}} w_{b,k_b}
+  \label{eq:carpal}
+\end{align}
+
+where $w_{b,k}$ is the published TW2 numeric score. Raw scores are
+normalized to $[0, 1000]$:
+\begin{equation}
+  \tilde{S} = \frac{S}{\displaystyle\sum_b \max_k w_{b,k}} \times 1000
+\end{equation}
+
+Bone age is read from sex-specific lookup tables via linear interpolation:
+\begin{equation}
+  \hat{t} = 0.75 \cdot \text{BA}_\text{RUS}(\tilde{S}_\text{RUS}, s)
+          + 0.25 \cdot \text{BA}_\text{Carpal}(\tilde{S}_\text{Carpal}, s)
+\end{equation}
+
+The 90\% confidence interval is:
+\begin{equation}
+  \text{CI}_{90\%} \approx \hat{t} \pm 1.645 \cdot \sigma(\tilde{S}_\text{RUS})
+\end{equation}
+
+\subsection{Stage 5: Gaussian Distribution Visualization}
+
+For each of the 20 bones, overlapping Gaussian curves display the
+reference probability density of each stage across the age axis:
+\begin{equation}
+  p(k \mid t, b, s) \propto
+  \mathcal{N}(t \mid \mu_{b,s,k}, \sigma_{b,s,k})
+\end{equation}
+
+The detected stage is highlighted with increased opacity. A vertical
+reference line marks the patient's chronological age, allowing the
+clinician to immediately visualize whether the bone is advanced, delayed,
+or appropriate for the patient's age.
+
+%% ============================================================
+\section{System Architecture}
+\label{sec:architecture}
+
+\subsection{Backend -- FastAPI REST API}
+
+The inference server is implemented in Python 3.11 with
+FastAPI~\cite{fastapi}. Primary endpoint:
+
+\begin{lstlisting}[language=bash,caption={API endpoint.}]
+POST /analyze
+  multipart/form-data:
+    image     : file (DICOM/PNG/JPEG)
+    sex       : "M" | "F"
+    scale_factor : float (optional)
+    chronological_age_months : float (opt.)
+
+  Response JSON:
+  { bone_age_months, bone_age_years,
+    confidence_interval, rus_score,
+    carpal_score, stages, bone_scores,
+    annotated_image_b64, gaussian_data }
+\end{lstlisting}
+
+A second endpoint \texttt{POST /analyze/pdf} returns a PDF clinical
+report. Reference endpoints expose the TW2 tables and Gaussian parameters
+for external use.
+
+\subsection{Frontend -- React Web Application}
+
+Built with React 18, Vite, TypeScript, TailwindCSS, and Recharts.
+Features three tabs:
+\begin{enumerate}[noitemsep]
+  \item \textbf{Annotated X-ray}: radiograph with 20 color-coded bounding
+    boxes labeled with bone name and predicted stage.
+  \item \textbf{TW2 Score Table}: per-bone stage, numeric score, and
+    group (RUS/Carpal); summary with bone age and 90\% CI.
+  \item \textbf{Gaussian Curves}: interactive Recharts area plot
+    with bone selector, reproducing the classic TW2 graphical output.
+\end{enumerate}
+
+\subsection{Training Pipeline}
+
+\begin{enumerate}[noitemsep]
+  \item \texttt{01\_explore\_rsna.ipynb}: Data exploration.
+  \item \texttt{02\_pseudo\_label\_generation.py}: Assign TW2 stages to
+    all 12,611 RSNA images.
+  \item \texttt{03\_train\_bone\_detector.py}: YOLOv8-s fine-tuning.
+  \item \texttt{04\_train\_stage\_classifier.py}: EfficientNet-B3
+    training with label smoothing.
+\end{enumerate}
+
+%% ============================================================
+\section{Evaluation Protocol}
+\label{sec:evaluation}
+
+\subsection{Bone Age Estimation Accuracy}
+
+\begin{align}
+  \text{MAE} &= \tfrac{1}{N}\textstyle\sum_{i=1}^N |\hat{t}_i - t_i| \\
+  \text{RMSE} &= \sqrt{\tfrac{1}{N}\textstyle\sum_{i=1}^N (\hat{t}_i - t_i)^2}
+\end{align}
+
+Reported separately for male/female and age groups $<$6y, 6--12y, $>$12y.
+
+\subsection{Stage Classification Quality}
+
+For a subset of 300 manually annotated cases:
+\begin{itemize}[noitemsep]
+  \item Per-bone accuracy (exact stage match).
+  \item Quadratic weighted Cohen's $\kappa$.
+  \item Confusion matrices for the 5 most clinically critical bones.
+\end{itemize}
+
+\subsection{Comparison Baselines}
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{Deeplasia}~\cite{deeplasia}: end-to-end CNN.
+  \item \textbf{Manual TW2}: radiologist protocol.
+  \item \textbf{GP atlas}: Greulich-Pyle.
+\end{enumerate}
+
+%% ============================================================
+\section{Expected Results and Discussion}
+\label{sec:results}
+
+\begin{table}[H]
+\centering
+\caption{Anticipated performance on RSNA test set.}
+\label{tab:results}
+\scriptsize
+\begin{tabularx}{\columnwidth}{@{}lXX@{}}
+\toprule
+Method & MAE (months) & $r^2$ \\
+\midrule
+GP Atlas (manual)         & 11.8--14.5 & 0.92 \\
+Manual TW2                & 9.5--12.0  & 0.95 \\
+Deeplasia~\cite{deeplasia}& 6.9        & 0.97 \\
+\textbf{BoneAgeTW2 (ours)}& 10--14     & 0.94 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The expected accuracy (10--14 months MAE) is intentionally higher than
+Deeplasia's end-to-end MAE because our system is constrained by the TW2
+protocol -- routing through discrete bone stages rather than optimizing
+directly for bone age. This is acceptable for three reasons:
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{Clinical interpretability}: Each bone's stage can be
+    reviewed and overridden by the clinician.
+  \item \textbf{Protocol compliance}: Many clinical and regulatory contexts
+    in Latin America mandate TW2 as the reporting standard.
+  \item \textbf{Educational value}: The system trains residents in TW2
+    staging by comparing their manual assessment with the AI prediction.
+\end{enumerate}
+
+\subsection{Pseudo-label Quality}
+
+Label quality is highest at ages where stage transitions have low variance.
+Accuracy degrades during transition periods ($\pm 1$ year around the mean
+transition age). Label smoothing ($\epsilon = 0.1$) mitigates overfitting
+to incorrect pseudo-labels.
+
+%% ============================================================
+\section{Ethical Considerations}
+\label{sec:ethics}
+
+\begin{itemize}[noitemsep]
+  \item The RSNA dataset was collected under IRB-approved protocols.
+    Images are de-identified.
+  \item BoneAgeTW2 is a \textbf{decision-support tool}, not a replacement
+    for clinical judgment. All outputs must be reviewed by a qualified
+    radiologist.
+  \item The reference population (RSNA, predominantly North American) may
+    not represent Latin American populations; a validation study on local
+    data is recommended before clinical deployment.
+  \item Bone age assessment in forensic contexts should follow professional
+    body recommendations regarding method uncertainty~\cite{schmeling2011}.
+\end{itemize}
+
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented BoneAgeTW2, the first open-source system to automate the
+complete Tanner-Whitehouse 2 protocol for skeletal maturity assessment.
+Combining YOLOv8 bone detection, EfficientNet-B3 stage classification
+with 20 specialized heads, hardcoded TW2 reference tables, and interactive
+Gaussian distribution visualization, the system delivers clinically
+interpretable bone age estimates that align with the established
+radiological workflow.
+
+The pseudo-label generation strategy enables training on large-scale bone
+age datasets (RSNA) despite the absence of per-bone stage annotations,
+opening a pathway for future work incorporating datasets with manual TW2
+annotations.
+
+\paragraph{Future directions.}
+(1) Validation on a Colombian pediatric population. (2) Active learning
+to incorporate expert corrections. (3) DICOM SR output for PACS/RIS
+integration. (4) Extension to TW3 reference curves.
+
+\paragraph{Code and Data.}
+\begin{itemize}[noitemsep]
+  \item \textbf{Repository}:
+    \url{https://github.com/jmmana/BoneAgeTW2}
+  \item \textbf{Dataset}:
+    \url{https://www.kaggle.com/datasets/kmader/rsna-bone-age}
+  \item \textbf{License}: MIT (code), CC BY-NC-SA 4.0 (weights)
+\end{itemize}
+
+%% ============================================================
+\section*{Acknowledgments}
+
+This work is part of the Master's in Artificial Intelligence program at
+Universidad de La Salle, Bogota, Colombia. The author acknowledges the
+Radiological Society of North America (RSNA) for making the Pediatric
+Bone Age Challenge dataset publicly available.
+
+%% ============================================================
+\bibliographystyle{plain}
+\begin{thebibliography}{99}
+
+\bibitem{tannerTW2}
+J.~M. Tanner, R.~H. Whitehouse, N.~Cameron, W.~A. Marshall,
+M.~J.~R. Healy, and H.~Goldstein,
+\textit{Assessment of Skeletal Maturity and Prediction of Adult Height
+(TW2 Method)}, 2nd~ed. Academic Press, London, 1983.
+
+\bibitem{tw32001}
+J.~M. Tanner, M.~J.~R. Healy, H.~Goldstein, and N.~Cameron,
+\textit{Assessment of Skeletal Maturity and Prediction of Adult Height
+(TW3 Method)}, 3rd~ed. Saunders, London, 2001.
+
+\bibitem{gp1959}
+W.~W. Greulich and S.~I. Pyle,
+\textit{Radiographic Atlas of Skeletal Development of the Hand and
+Wrist}, 2nd~ed. Stanford University Press, Stanford, CA, 1959.
+
+\bibitem{rsna2017}
+S.~S. Halabi \textit{et al.},
+``The RSNA Pediatric Bone Age Machine Learning Challenge,''
+\textit{Radiology}, vol.~290, no.~2, pp.~498--503, 2019.
+\doi{10.1148/radiol.2018180736}
+
+\bibitem{deeplasia}
+S.~Rassmann \textit{et al.},
+``Deeplasia: Prior-free deep learning for pediatric bone age assessment
+robust to skeletal dysplasias,''
+\textit{medRxiv}, 2023.
+\doi{10.1101/2023.03.07.23286906}
+
+\bibitem{bonexpert}
+H.~H. Thodberg, S.~Kreiborg, A.~Juul, and K.~D. Pedersen,
+``The BoneXpert method for automated determination of skeletal
+maturity,''
+\textit{IEEE Trans. Med. Imaging}, vol.~28, no.~1, pp.~52--66, 2009.
+
+\bibitem{carpian}
+Hospital Italiano de Buenos Aires,
+``CarpIAn: AI-Based Bone Age System,'' 2021.
+\url{https://www.hospitalitaliano.org.ar/hiba/es/node/2294}
+
+\bibitem{yolov8}
+G.~Jocher \textit{et al.},
+``Ultralytics YOLOv8,'' 2023.
+\url{https://github.com/ultralytics/ultralytics}
+
+\bibitem{efficientnet}
+M.~Tan and Q.~V. Le,
+``EfficientNet: Rethinking Model Scaling for Convolutional Neural
+Networks,'' in \textit{Proc. ICML}, 2019.
+
+\bibitem{fastapi}
+S.~Ramirez, ``FastAPI,'' 2018. \url{https://fastapi.tiangolo.com}
+
+\bibitem{grote2012}
+H.~Grote, U.~Biermann, H.~Schulz, and W.~Schneider,
+``Precision of bone age determination under consideration of various
+standards,'' \textit{Rofo}, vol.~184, no.~2, pp.~138--143, 2012.
+
+\bibitem{fels1988}
+A.~F. Roche, W.~C. Chumlea, and D.~Thissen,
+\textit{Assessing the Skeletal Maturity of the Hand-Wrist: FELS
+Method}. Charles C. Thomas, Springfield, IL, 1988.
+
+\bibitem{schmeling2011}
+A.~Schmeling \textit{et al.},
+``Forensic age estimation in living subjects,''
+\textit{Dtsch. Arztebl. Int.}, vol.~113, no.~4, pp.~44--50, 2016.
+
+\bibitem{rassmann2023}
+S.~Rassmann, P.~Buchler, and T.~Ruber,
+``Bone age assessment using end-to-end deep learning,''
+\url{https://github.com/sRassmann/bone-age}, 2023.
+
+\end{thebibliography}
+
+\end{document}
