@@ -61,11 +61,27 @@ def build_model(bone: str, feat_dim: int) -> nn.Module:
     return nn.Sequential(nn.Linear(feat_dim, 256), nn.ReLU(), nn.Dropout(0.3), nn.Linear(256, n_classes))
 
 
-def train(rsna_dir: Path, labels_csv: Path, output: Path, epochs: int = 20, batch: int = 32):
+def save_model(backbone, heads, feat_dim, path: Path):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save({
+        "backbone": backbone.state_dict(),
+        "heads": {bone: head.state_dict() for bone, head in heads.items()},
+        "feat_dim": feat_dim,
+    }, path)
+    print(f"Saved → {path}")
+
+
+def train(rsna_dir: Path, labels_csv: Path, output: Path, epochs: int = 20, batch: int = 32, subsample: float = 1.0):
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Device: {device}")
 
     df = pd.read_csv(labels_csv)
+    all_ids = df["image_id"].unique()
+    if subsample < 1.0:
+        rng = np.random.default_rng(42)
+        all_ids = rng.choice(all_ids, size=int(len(all_ids) * subsample), replace=False)
+        print(f"Subsampled: {len(all_ids)} images ({subsample*100:.0f}%)")
+    df = df[df["image_id"].isin(all_ids)]
     train_ids, val_ids = train_test_split(df["image_id"].unique(), test_size=0.1, random_state=42)
     df_train = df[df["image_id"].isin(train_ids)]
     df_val = df[df["image_id"].isin(val_ids)]
@@ -126,15 +142,11 @@ def train(rsna_dir: Path, labels_csv: Path, output: Path, epochs: int = 20, batc
         scheduler.step()
         avg_loss = total_loss / max(n_batches, 1)
         print(f"Epoch {epoch+1}/{epochs} — loss: {avg_loss:.4f}")
+        # Save checkpoint after every epoch so timeouts don't lose work
+        ckpt = output.with_name(output.stem + f"_epoch{epoch+1}" + output.suffix)
+        save_model(backbone, heads, feat_dim, ckpt)
 
-    # Save combined model state
-    output.parent.mkdir(parents=True, exist_ok=True)
-    torch.save({
-        "backbone": backbone.state_dict(),
-        "heads": {bone: head.state_dict() for bone, head in heads.items()},
-        "feat_dim": feat_dim,
-    }, output)
-    print(f"Saved → {output}")
+    save_model(backbone, heads, feat_dim, output)
 
 
 if __name__ == "__main__":
@@ -144,5 +156,6 @@ if __name__ == "__main__":
     p.add_argument("--output", type=Path, default=Path("backend/ml/weights/stage_classifier.pt"))
     p.add_argument("--epochs", type=int, default=20)
     p.add_argument("--batch", type=int, default=32)
+    p.add_argument("--subsample", type=float, default=1.0, help="Fraction of images to use (0-1)")
     args = p.parse_args()
-    train(args.rsna_dir, args.labels, args.output, args.epochs, args.batch)
+    train(args.rsna_dir, args.labels, args.output, args.epochs, args.batch, args.subsample)
