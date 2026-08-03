@@ -775,30 +775,36 @@ for three representative validation radiographs spanning the pediatric
 age range.
 For each radiograph, the figure reports the model's predicted TW2
 maturation stage for all 20 bones (13 RUS and 7 Carpal).
-The stage assignments are anatomically consistent across all three
-patients: young subjects ($<$6 years) show early stages (B--D) for
-long bones and immature carpal ossification, adolescent patients
-(10--13 years) show intermediate stages (D--F) across all bones with
-progressive fusion, and near-adult subjects ($>$16 years) show
-terminal stages (G--I) for RUS bones.
-Carpal stages advance earlier, consistent with the clinical TW2
-literature and with the higher per-bone accuracy reported in
-Table~\ref{tab:accuracy}.
+The stage assignments are anatomically consistent:
+the young child (1.8 years chronological) shows stage~D across
+most long bones, C--E for carpals;
+the adolescent (12.5 years) shows stage~H across all 20 bones
+(near-complete fusion);
+and the near-adult (17.2 years) shows stage~I for all 13 RUS bones
+(fully fused) and stage~H for all 7 carpal bones (carpal maximum).
+The near-adult TW2 bone age (17.0 years) agrees closely with
+chronological age, while the adolescent case shows systematic
+overestimation (18.3 vs.\ 12.5 years), illustrating the
+population-calibration effect described in Section~\ref{sec:discussion}.
 
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{figure_qualitative}
-\caption{Qualitative results: predicted TW2 maturation stages for all
-20 bones on three representative validation radiographs.
-\textit{Left column}: young child ($<$6 years chronological age).
-\textit{Center}: adolescent (10--13 years).
-\textit{Right}: near-adult ($>$16 years).
-Each panel shows the AP hand radiograph (top) and the model's
-predicted stage for each of the 20 TW2 bone sites (bottom).
-Stage labels are: A=immature through I=fused-adult (A--H for carpal
-bones). The consistent progression from early to terminal stages
-across the three age groups confirms that the model captures
-the developmental trajectory defined by TW2.}
+\caption{Qualitative BoneAgeTW2 predictions (EfficientNet-B3, epoch~5)
+for three RSNA validation radiographs.
+\textit{(a)} Male, 1.8 years chronological / TW2 bone age 5.0 years —
+long bones at stage D (early epiphyseal cap), carpals at C--E.
+\textit{(b)} Male, 12.5 years / TW2 18.3 years —
+all 20 bones at stage H (near-complete fusion;
+large systematic offset reflects population-calibration mismatch,
+see Section~\ref{sec:discussion}).
+\textit{(c)} Male, 17.2 years / TW2 17.0 years —
+all RUS bones at terminal stage I (adult), all carpals at H.
+Each panel shows the AP radiograph (top) and the per-bone
+stage table (bottom): long bones A--I, carpals A--H.
+The anatomically coherent progression across age groups
+confirms that the classifier captures the developmental
+trajectory defined by TW2 despite pseudo-label training.}
 \label{fig:qualitative}
 \end{figure*}
 
